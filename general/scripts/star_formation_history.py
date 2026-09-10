@@ -75,10 +75,16 @@ for idx, (snapshot_filename, sfr_filename, name) in enumerate(
 
 # Observational data plotting
 
-observational_data = read_obs_data(
-    f"{arguments.config.config_directory}/{arguments.config.observational_data_directory}"
-    "/data/StarFormationRateHistory/raw"
-)
+try:
+    observational_data = read_obs_data(
+        f"{arguments.config.config_directory}/{arguments.config.observational_data_directory}"
+        "/data/StarFormationRateHistory/raw"
+    )
+except (FileNotFoundError, OSError):
+    # Observational comparison data is optional. If the observational_data
+    # submodule is not available, still plot the simulation SFH(s) without it.
+    print("Observational SFH data not found; plotting simulations only.")
+    observational_data = []
 
 observation_lines = []
 observation_labels = []

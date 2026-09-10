@@ -63,15 +63,25 @@ EAGLE run does not write:
 How to run it on your EAGLE run
 -------------------------------
 
-First, build the observational data once (from the repo root):
+`SFR.txt`, `statistics.txt` and `timesteps.txt` are expected in the input
+directory for the log-based figures.
+
+### Observational data is optional
+
+The `observational_data` submodule only adds *observational comparison points*
+to a few figures — it is not needed for your simulation data. The evolution
+plots (`*_metallicity_evolution`, `*_mass_evolution`, `bh_accretion_evolution`)
+`glob` for it and silently skip the overlay if it is absent, and
+`star_formation_history.py` falls back to plotting the simulation curves only.
+So you can run everything without it.
+
+If you *do* have access to the (SWIFTSIM-internal) comparison-data repo and want
+the overlays, build it once from the repo root:
 
 ```bash
 git submodule update --init --recursive
 cd observational_data && ./convert.py && cd ..
 ```
-
-`SFR.txt`, `statistics.txt` and `timesteps.txt` are expected in the input
-directory for the log-based figures.
 
 ### No halo catalogue? Use `run_pipeline.py` (recommended here)
 
