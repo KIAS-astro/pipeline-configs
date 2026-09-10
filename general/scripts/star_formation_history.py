@@ -143,6 +143,50 @@ for index, observation in enumerate(observational_data):
         )
     observation_labels.append(observation.description)
 
+# Analytic cosmic SFRD references, plotted directly as SFR density
+# [Msun/yr/Mpc^3] to match the y-axis (no box-volume scaling needed).
+#   Madau & Dickinson (2014), ARA&A 52, 415, Eq. 15 -- native Salpeter IMF.
+#   Behroozi, Wechsler & Conroy (2013), ApJ 770, 57 -- native Chabrier IMF.
+# The SWIFT EAGLE/FLAMINGO models use a Chabrier IMF, so MD14 is converted to
+# Chabrier by dividing by the standard 1.7 SFR-calibration ratio; Behroozi+13
+# is already Chabrier. (No h-rescaling is applied; both fits assume h=0.7,
+# which differs from the simulation's h at the few-percent level.)
+reference_redshift = np.logspace(-3, np.log10(20.0), 200)
+reference_scale_factor = 1.0 / (1.0 + reference_redshift)
+
+madau_dickinson = (
+    0.015
+    * (1.0 + reference_redshift) ** 2.7
+    / (1.0 + ((1.0 + reference_redshift) / 2.9) ** 5.6)
+) / 1.7
+behroozi = 0.180 / (
+    10.0 ** (-0.997 * (reference_redshift - 1.243))
+    + 10.0 ** (0.241 * (reference_redshift - 1.243))
+)
+
+observation_lines.append(
+    ax.plot(
+        reference_scale_factor,
+        madau_dickinson,
+        color="black",
+        linestyle="dashed",
+        linewidth=1,
+        zorder=-5000,
+    )[0]
+)
+observation_labels.append("Madau \\& Dickinson (2014)")
+observation_lines.append(
+    ax.plot(
+        reference_scale_factor,
+        behroozi,
+        color="black",
+        linestyle="dotted",
+        linewidth=1,
+        zorder=-5000,
+    )[0]
+)
+observation_labels.append("Behroozi et al. (2013)")
+
 redshift_ticks = np.array([0.0, 0.2, 0.5, 1.0, 2.0, 3.0, 5.0, 10.0, 20.0, 50.0, 100.0])
 redshift_labels = [
     "$0$",
