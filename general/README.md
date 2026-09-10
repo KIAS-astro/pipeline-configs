@@ -63,27 +63,49 @@ EAGLE run does not write:
 How to run it on your EAGLE run
 -------------------------------
 
-1. Build the observational data once (from the repo root):
+First, build the observational data once (from the repo root):
 
-   ```bash
-   git submodule update --init --recursive
-   cd observational_data && ./convert.py && cd ..
-   ```
+```bash
+git submodule update --init --recursive
+cd observational_data && ./convert.py && cd ..
+```
 
-2. Run the pipeline pointing at this config and your snapshot/logs, e.g.:
+`SFR.txt`, `statistics.txt` and `timesteps.txt` are expected in the input
+directory for the log-based figures.
 
-   ```bash
-   swift-pipeline \
-     -C general \
-     -c general/config.yml \
-     -i /path/to/your/run \
-     -s snapshot_XXXX.hdf5 \
-     -n "My EAGLE run" \
-     -o /path/to/output
-   ```
+### No halo catalogue? Use `run_pipeline.py` (recommended here)
 
-   (`SFR.txt`, `statistics.txt` and `timesteps.txt` are expected in the input
-   directory `-i` for the log-based figures.)
+`swift-pipeline` **requires** a VELOCIraptor/SOAP catalogue (`-c`) and loads it
+unconditionally, even when no scaling-relation figures are produced. If you only
+have snapshots and logs, use the bundled catalogue-free runner instead. It reads
+`config.yml` and calls each script directly (all figures in this config are
+catalogue-free), then writes an `index.html`:
+
+```bash
+python general/run_pipeline.py \
+  -i /path/to/your/run \
+  -s snapshot_XXXX.hdf5 \
+  -n "My EAGLE run" \
+  -o /path/to/output \
+  -j 8
+```
+
+Options: `--only density_temperature.py ...` to run a subset, `--debug` to print
+each script's output. When you later produce a catalogue, either add the
+catalogue-based figures to `config.yml` or switch to `swift-pipeline` below.
+
+### With a halo catalogue: full `swift-pipeline`
+
+```bash
+swift-pipeline \
+  -C general \
+  -i /path/to/your/run \
+  -s snapshot_XXXX.hdf5 \
+  -c halo_XXXX.properties \
+  -n "My EAGLE run" \
+  -o /path/to/output \
+  -j 8
+```
 
 Notes
 -----
