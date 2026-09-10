@@ -88,14 +88,20 @@ if __name__ == "__main__":
                 "n_pivot": "EAGLEFeedback:SNII_energy_fraction_n_0_H_p_cm3",
             }.items()
         }
-        star_formation_parameters = {
-            k: float(used_parameters[v])
-            for k, v in {
-                "threshold_Z0": "EAGLEStarFormation:threshold_Z0",
-                "threshold_n0": "EAGLEStarFormation:threshold_norm_H_p_cm3",
-                "slope": "EAGLEStarFormation:threshold_slope",
-            }.items()
-        }
+        # The EAGLE star-formation-law threshold parameters are only present for
+        # runs that use the EAGLE SF law (e.g. not FLAMINGO). If they are absent,
+        # leave this empty; the SF-threshold line below is then simply skipped.
+        try:
+            star_formation_parameters = {
+                k: float(used_parameters[v])
+                for k, v in {
+                    "threshold_Z0": "EAGLEStarFormation:threshold_Z0",
+                    "threshold_n0": "EAGLEStarFormation:threshold_norm_H_p_cm3",
+                    "slope": "EAGLEStarFormation:threshold_slope",
+                }.items()
+            }
+        except KeyError:
+            star_formation_parameters = {}
 
         # Now need to make background grid of f_E.
         birth_density_grid, metal_mass_fraction_grid = np.meshgrid(
